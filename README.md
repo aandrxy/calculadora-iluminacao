@@ -1,8 +1,10 @@
 # Calculadora de Iluminação
 
-Ferramenta web **offline** para dimensionar a iluminação artificial de ambientes: quantas lâmpadas/luminárias são necessárias, qual o nível de iluminância resultante e quanto isso representa em potência, corrente elétrica, consumo e custo.
+Ferramenta web para dimensionar a iluminação artificial de ambientes: quantas lâmpadas/luminárias são necessárias, qual o nível de iluminância resultante e quanto isso representa em potência, corrente elétrica, consumo e custo.
 
-Foi pensada como apoio rápido de projeto: o usuário informa o ambiente, escolhe o objetivo do cálculo e acompanha o resultado atualizar em tempo real, sem backend, sem instalação e sem dependências.
+Foi pensada como apoio rápido de projeto: o usuário informa o ambiente, escolhe o objetivo do cálculo e acompanha o resultado atualizar em tempo real.
+
+🔗 **Acesse online:** https://aandrxy.github.io/calculadora-iluminacao/
 
 ---
 
@@ -70,37 +72,6 @@ Este modo habilita ainda:
 
 ---
 
-## Estrutura do projeto
-
-```
-calculadora-iluminacao/
-├── index.html      # estrutura da página (markup)
-├── css/
-│   └── style.css   # tokens de cor, layout, componentes, impressão e responsivo
-├── js/
-│   └── app.js      # lógica de cálculo, interface e relatório
-└── README.md
-```
-
-Sem build e sem pacotes: HTML, CSS e JavaScript puros.
-
-## Como usar
-
-1. Baixe/clone a pasta mantendo a estrutura acima.
-2. Abra o `index.html` em qualquer navegador moderno.
-3. Escolha o objetivo na seção **Objetivo do cálculo**, informe a área (ou largura × comprimento) e o tipo de ambiente.
-
-Funciona offline. A única chamada externa é a fonte *Inter* (Google Fonts); sem internet o navegador usa uma fonte do sistema, sem prejuízo de funcionamento.
-
----
-
 ## Aviso importante
 
 Os resultados são **estimativas de referência**. O Fu automático usa uma curva simplificada, a distribuição é uma sugestão geométrica e o dimensionamento elétrico é aproximado. Para projetos luminotécnicos e elétricos finais, utilize software de cálculo fotométrico e a validação de um profissional habilitado, observando as normas aplicáveis (NBR 5413 / NBR ISO/CIE 8995-1 e NBR 5410).
-
-## Ideias para evoluções
-
-- Salvar projetos no navegador (localStorage) ou exportar/importar em JSON.
-- Tabelas de Fu por fabricante/luminária em vez da curva simplificada.
-- Escolha de luminárias de um catálogo com curva fotométrica.
-- Exportar o relatório em planilha.
