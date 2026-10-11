@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Iluminação Avançada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="none">
+        <path d="M9 21h6M10 18h4M12 3a6 6 0 0 0-3.6 10.8c.5.4.8 1 .8 1.7v.5h5.6v-.5c0-.7.3-1.3.8-1.7A6 6 0 0 0 12 3Z" stroke="#e3a03a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <h1>Calculadora de Iluminação</h1>
+        <p class="brand-sub">Dimensionamento luminotécnico, elétrico e de custos</p>
+      </div>
+    </div>
+    <div class="header-pills">
+      <div class="pill">
+        <span class="pill-label">Modo ativo</span>
+        <span class="pill-value" id="headModeStat">Lâmpadas</span>
+      </div>
+      <div class="pill">
+        <span class="pill-label">Ambientes no projeto</span>
+        <span class="pill-value" id="headRoomsStat">0</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="workspace">
+
+  <!-- ================= COLUNA DE ENTRADA ================= -->
+  <div class="col col-input">
+
+    <section class="card span2">
+      <h2 class="card-title">Objetivo do cálculo</h2>
+      <div class="toggle" id="calcModeToggle">
+        <button class="active" data-calcmode="lamps">Lâmpadas necessárias</button>
+        <button data-calcmode="lux">Lux resultante</button>
+        <button data-calcmode="full">Projeto completo</button>
+      </div>
+      <p class="hint">Escolha o que deseja obter. <strong>Projeto completo</strong> habilita fator de utilização, refletâncias, custos e dimensionamento elétrico.</p>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">Ambiente e dimensões</h2>
+
+      <div class="field full" style="margin-bottom:9px;">
+        <label>Como informar o tamanho</label>
+        <div class="toggle" id="modeToggle">
+          <button class="active" data-mode="area">Área direta (m²)</button>
+          <button data-mode="dims">Largura × Comprimento</button>
+        </div>
+      </div>
+
+      <div id="areaFields">
+        <div class="row">
+          <div class="field full">
+            <label>Área do cômodo (m²)</label>
+            <input type="number" id="areaInput" inputmode="decimal" placeholder="ex: 12" min="0" step="0.1">
+          </div>
+        </div>
+      </div>
+
+      <div id="dimsFields" style="display:none;">
+        <div class="row">
+          <div class="field">
+            <label>Largura (m)</label>
+            <input type="number" id="widthInput" inputmode="decimal" placeholder="ex: 3" min="0" step="0.1">
+          </div>
+          <div class="field">
+            <label>Comprimento (m)</label>
+            <input type="number" id="lengthInput" inputmode="decimal" placeholder="ex: 4" min="0" step="0.1">
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field full">
+          <label id="roomTypeLabel">Tipo de ambiente</label>
+          <select id="roomType">
+            <option value="150" data-cri="80">Quarto (150 lx)</option>
+            <option value="200" data-cri="80" selected>Sala de estar (200 lx)</option>
+            <option value="200" data-cri="80">Banheiro (200 lx)</option>
+            <option value="400" data-cri="90">Cozinha (400 lx)</option>
+            <option value="300" data-cri="80">Área de serviço (300 lx)</option>
+            <option value="150" data-cri="80">Corredor / hall (150 lx)</option>
+            <option value="120" data-cri="70">Garagem (120 lx)</option>
+            <option value="500" data-cri="90">Escritório / home office (500 lx)</option>
+            <option value="750" data-cri="90">Comercial / loja (750 lx)</option>
+            <option value="custom" data-cri="80">Personalizado…</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" id="customLuxRow" style="display:none;">
+        <div class="field full">
+          <label>Lux desejado (personalizado)</label>
+          <input type="number" id="customLux" inputmode="decimal" placeholder="ex: 250" min="0" step="10">
+        </div>
+      </div>
+
+      <p class="hint">Referência de iluminância: ambientes residenciais seguem a NBR 5413; escritório e comercial seguem a NBR ISO/CIE 8995-1 (que substituiu a NBR 5413 para ambientes de trabalho). Ajuste em "Personalizado" se precisar.</p>
+    </section>
+
+    <section class="card" id="lampLumensField">
+      <h2 class="card-title">Lâmpada de referência</h2>
+
+      <div class="row" id="lampQtyRow" style="display:none;">
+        <div class="field full">
+          <label>Quantidade de lâmpadas instaladas</label>
+          <input type="number" id="lampQty" inputmode="numeric" placeholder="ex: 4" min="1" step="1" value="4">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Lúmens por lâmpada</label>
+          <input type="number" id="lampLumens" inputmode="decimal" placeholder="ex: 800" min="1" step="1" value="800">
+        </div>
+        <div class="field" id="effWField">
+          <label>Eficácia LED de ref. (lm/W)</label>
+          <input type="number" id="ledEfficacy" inputmode="decimal" placeholder="ex: 90" min="10" step="5" value="90">
+        </div>
+      </div>
+
+      <div class="presets" id="lampPresets" style="margin-top:10px;">
+        <button class="preset-btn" data-lm="450">450 lm</button>
+        <button class="preset-btn active" data-lm="800">800 lm</button>
+        <button class="preset-btn" data-lm="1000">1000 lm</button>
+        <button class="preset-btn" data-lm="1500">1500 lm</button>
+        <button class="preset-btn" data-lm="2000">2000 lm</button>
+      </div>
+    </section>
+
+    <section class="card span2" id="fullFields" style="display:none;">
+      <h2 class="card-title">Parâmetros do projeto luminotécnico</h2>
+
+      <div class="ff-grid">
+        <div class="ff-col">
+          <h3 class="subsection-title">Qualidade da luz</h3>
+          <div class="cct-card">
+            <div class="cct-swatch" id="colorPreview"></div>
+            <div class="cct-controls">
+              <div class="cct-value-row">
+                <span class="cct-kelvin" id="cctKelvinLabel">4000 K</span>
+                <span class="cct-desc" id="cctDescLabel">Branco Neutro</span>
+              </div>
+              <input type="range" id="colorTemp" min="2000" max="6500" step="50" value="4000">
+              <div class="presets" id="cctPresets">
+                <button class="preset-btn" data-k="2700">2700K</button>
+                <button class="preset-btn" data-k="3000">3000K</button>
+                <button class="preset-btn active" data-k="4000">4000K</button>
+                <button class="preset-btn" data-k="5000">5000K</button>
+                <button class="preset-btn" data-k="6500">6500K</button>
+              </div>
+            </div>
+          </div>
+          <p class="hint">Arraste o controle para ajustar manualmente a temperatura de cor (2000K–6500K), ou use os atalhos.</p>
+          <div class="row" style="margin-top:10px;">
+            <div class="field full">
+              <label>Índice de Reprodução de Cor (IRC / CRI)</label>
+              <select id="criSelect">
+                <option value="70">IRC 70 (básico)</option>
+                <option value="80" selected>IRC 80 (padrão)</option>
+                <option value="90">IRC 90 (alta fidelidade)</option>
+                <option value="95">IRC 95+ (crítico – arte/varejo)</option>
+              </select>
+            </div>
+          </div>
+          <p class="hint" id="criHint"></p>
+        </div>
+
+        <div class="ff-col">
+          <h3 class="subsection-title">Luminária</h3>
+          <div class="row">
+            <div class="field">
+              <label>Pé direito (m)</label>
+              <input type="number" id="ceilingHeight" inputmode="decimal" placeholder="ex: 2.8" min="0" step="0.1" value="2.8">
+            </div>
+            <div class="field">
+              <label>Potência da luminária (W)</label>
+              <input type="number" id="lumPower" inputmode="decimal" placeholder="ex: 36" min="0" step="0.5" value="36">
+            </div>
+          </div>
+          <div class="row">
+            <div class="field full">
+              <label>Fluxo luminoso (lm)</label>
+              <input type="number" id="lumFlux" inputmode="decimal" placeholder="ex: 3500" min="1" step="1" value="3500">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subsection-title" style="margin-top:13px;">Configurações avançadas</h3>
+      <div class="adv-grid">
+        <details class="subgroup">
+          <summary>Refletância das superfícies</summary>
+          <div class="subgroup-body">
+            <div class="row">
+              <div class="field">
+                <label>Teto</label>
+                <select id="reflCeiling">
+                  <option value="70" selected>70% (branco)</option>
+                  <option value="50">50% (clara)</option>
+                  <option value="30">30% (média)</option>
+                  <option value="10">10% (escura)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Parede</label>
+                <select id="reflWall">
+                  <option value="70">70% (branca)</option>
+                  <option value="50" selected>50% (clara)</option>
+                  <option value="30">30% (média)</option>
+                  <option value="10">10% (escura)</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="field full">
+                <label>Piso</label>
+                <select id="reflFloor">
+                  <option value="30">30% (claro)</option>
+                  <option value="20" selected>20% (médio)</option>
+                  <option value="10">10% (escuro)</option>
+                </select>
+              </div>
+            </div>
+            <p class="hint">Superfícies mais claras refletem mais luz e aumentam o Fu; superfícies escuras absorvem luz e reduzem o Fu.</p>
+          </div>
+        </details>
+
+        <details class="subgroup">
+          <summary>Fatores de cálculo</summary>
+          <div class="subgroup-body">
+            <div class="row">
+              <div class="field">
+                <label>Fator de utilização (Fu) <span id="fuModeBadge" style="font-size:9px;color:var(--teal)">(Auto)</span></label>
+                <input type="number" id="fatorUtil" inputmode="decimal" placeholder="Autocalculado" min="0.1" max="1" step="0.05">
+              </div>
+              <div class="field">
+                <label>Fator de depreciação (Fd)</label>
+                <input type="number" id="fatorDepr" inputmode="decimal" placeholder="ex: 0.8" min="0.1" max="1" step="0.05" value="0.8">
+              </div>
+            </div>
+            <p class="hint" id="fuHint">Fu calculado via Índice do Recinto (K), a partir de largura, comprimento e pé direito. Editar o campo trava o auto-cálculo.</p>
+            <button type="button" class="preset-btn" id="resetFuBtn" style="display:none;">↺ Voltar para cálculo automático</button>
+          </div>
+        </details>
+
+        <details class="subgroup">
+          <summary>Custos estimados</summary>
+          <div class="subgroup-body">
+            <div class="row">
+              <div class="field">
+                <label>Custo médio da luminária (R$)</label>
+                <input type="number" id="custoLum" inputmode="decimal" placeholder="ex: 45" min="0" step="1" value="45">
+              </div>
+              <div class="field">
+                <label>Instalação por ponto (R$)</label>
+                <input type="number" id="custoInst" inputmode="decimal" placeholder="ex: 60" min="0" step="1" value="60">
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="subgroup ff-wide">
+          <summary>Dimensionamento elétrico e consumo</summary>
+          <div class="subgroup-body">
+              <div class="row">
+                <div class="field">
+                  <label>Tensão</label>
+                  <select id="voltageSelect">
+                    <option value="127" selected>127 V</option>
+                    <option value="220">220 V</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Disjuntor (A)</label>
+                  <input type="number" id="breakerInput" inputmode="numeric" placeholder="ex: 10" min="6" step="1" value="10">
+                </div>
+              </div>
+              <div class="row">
+                <div class="field">
+                  <label>Uso (h/dia)</label>
+                  <input type="number" id="usageHours" inputmode="decimal" placeholder="ex: 5" min="0" step="0.5" value="5">
+                </div>
+                <div class="field">
+                  <label>Dias de uso/mês</label>
+                  <input type="number" id="usageDays" inputmode="numeric" placeholder="ex: 30" min="1" step="1" value="30">
+                </div>
+              </div>
+              <div class="row">
+                <div class="field full">
+                  <label>Tarifa de energia (R$/kWh)</label>
+                  <input type="number" id="tariffInput" inputmode="decimal" placeholder="ex: 0.75" min="0" step="0.01" value="0.75">
+                </div>
+              </div>
+              <p class="hint">Estimativas de referência: corrente ≈ P÷V; circuitos considerando 80% da capacidade do disjuntor. Consulte o projetista elétrico responsável para o dimensionamento final.</p>
+            </div>
+          </details>
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- ================= COLUNA DE RESULTADOS ================= -->
+  <div class="col col-results">
+
+    <section class="card result-card">
+      <div class="result-head">
+        <svg class="bulb-visual" viewBox="0 0 64 64" fill="none" id="bulbVisual">
+          <defs>
+            <radialGradient id="glowGrad" cx="50%" cy="42%" r="60%">
+              <stop offset="0%" stop-color="#fdeacb" id="glowStop1"/>
+              <stop offset="100%" stop-color="#e3a03a" id="glowStop2" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="32" cy="28" r="26" fill="url(#glowGrad)" id="glowCircle"/>
+          <path d="M32 8a17 17 0 0 0-10 30.7c1.4 1.1 2.2 2.8 2.2 4.6v1.2h15.6v-1.2c0-1.8.8-3.5 2.2-4.6A17 17 0 0 0 32 8Z" stroke="#e3a03a" stroke-width="2" id="bulbPath" fill="none"/>
+          <path d="M26 52h12M27.5 57h9" stroke="#aab0c0" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div class="result-data">
+          <div class="result-main" id="mainResult">0 <span>lúmens necessários</span></div>
+          <div class="result-sub" id="subResult">Preencha os campos ao lado</div>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <div class="stat">
+          <div class="stat-label" id="statLabel1">Lâmpadas necessárias</div>
+          <div class="stat-value teal" id="lampCount">–</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label" id="statLabel2">Potência total estimada</div>
+          <div class="stat-value" id="wattTotal">–</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="techPanel" style="display:none;">
+      <h2 class="card-title">Detalhes técnicos</h2>
+      <div class="breakdown">
+        <div class="stat">
+          <div class="stat-label">Densidade de Potência (DPI)</div>
+          <div class="stat-value"><span id="dpiValueText">–</span> <span class="badge" id="dpiBadge" style="display:none;"></span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Corrente Elétrica Estimada</div>
+          <div class="stat-value teal" id="currentValue">–</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Circuitos Recomendados</div>
+          <div class="stat-value" id="circuitsValue">–</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Consumo Mensal Estimado</div>
+          <div class="stat-value teal" id="consumptionValue">–</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="layoutPanel" style="display:none;">
+      <h2 class="card-title">Distribuição sugerida <span class="badge good" id="layoutBadge" style="display:none;"></span></h2>
+      <div class="layout-svg-wrap">
+        <svg id="layoutSvg" viewBox="0 0 300 210" width="100%" style="max-width:300px;"></svg>
+      </div>
+      <div class="breakdown">
+        <div class="stat">
+          <div class="stat-label">Arranjo (linhas × colunas)</div>
+          <div class="stat-value teal" id="layoutGrid">–</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Espaçamento aprox.</div>
+          <div class="stat-value" id="layoutSpacing">–</div>
+        </div>
+      </div>
+      <p class="layout-note" id="layoutNote"></p>
+    </section>
+
+    <div class="project-block">
+      <button class="action-btn primary" id="addRoomBtn">+ Adicionar ambiente ao projeto geral</button>
+
+      <section class="card" id="globalProjectPanel" style="display:none;">
+        <h2 class="card-title">Resumo geral do projeto</h2>
+        <div class="breakdown">
+          <div class="stat">
+            <div class="stat-label">Total de Pontos / Lâmpadas</div>
+            <div class="stat-value teal" id="globalTotalLamps">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Custo Total Estimado</div>
+            <div class="stat-value" id="globalTotalCost">R$ 0</div>
+          </div>
+          <div class="stat wide">
+            <div class="stat-label">Carga de Iluminação Total</div>
+            <div class="stat-value" id="globalTotalWatts">0 W</div>
+          </div>
+          <div class="stat wide" id="globalConsumptionStat">
+            <div class="stat-label">Consumo Mensal Estimado</div>
+            <div class="stat-value teal" id="globalTotalConsumption">–</div>
+          </div>
+        </div>
+        <label class="list-label">Ambientes salvos</label>
+        <div class="rooms-list" id="roomsList"></div>
+        <button class="clear-link" id="clearRoomsBtn">Limpar todos os ambientes</button>
+      </section>
+
+      <button class="action-btn export-btn" id="exportBtn">⭳ Exportar PDF / Imprimir projeto</button>
+    </div>
+
+  </div>
+  </main>
+
+</div>
+
+<div id="printReport" class="print-only"></div>
+<script src="js/app.js"></script>
+</body>
+</html>
